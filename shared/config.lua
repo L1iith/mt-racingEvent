@@ -3,7 +3,7 @@ Config = {}
 -- NPC Configuration
 Config.NPC = {
     Model = 's_m_m_lawyer_01',
-    Location = vector4(-544.28, -204.16, 37.65, 206.55), -- City Hall
+    Location = vector4(-544.28, -204.16, 37.65, 206.55),
     Animation = {
         Dict = 'missheistdockssetup1clipboard@base',
         Name = 'base',

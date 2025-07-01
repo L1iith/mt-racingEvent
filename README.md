@@ -12,12 +12,14 @@ A comprehensive FiveM racing tournament management system built with modern web 
 - **NPC Interaction**: Immersive NPC-based registration at City Hall
 - **Zone-Based Spawning**: Intelligent NPC spawning system using ox_lib zones
 
-### Modern UI/UX
-- **Svelte 5**: Latest Svelte framework with reactive runes
+### Modern UI/UX (COMPLETELY REWRITTEN)
+- **Svelte 5**: Latest Svelte framework with reactive runes and $state/$effect
+- **Tailwind CSS**: Utility-first CSS framework with custom design system
 - **Responsive Design**: Mobile-friendly interface with modern animations
 - **Real-time Updates**: Live data synchronization between client and server
 - **Interactive Components**: Modular, reusable UI components
-- **Dark Theme**: Professionally designed racing-themed interface
+- **Dark Theme**: Professionally designed racing-themed interface with glassmorphism
+- **Performance**: Optimized bundle with tree-shaking and modern build tools
 
 ### Advanced Features
 - **Role-Based Teams**: Captain, Driver, Navigator, and Mechanic roles
@@ -118,29 +120,6 @@ Configure permissions in your QB-Core setup:
 - View system statistics
 - Handle player disputes
 
-## 🏗️ File Structure
-
-```
-racing-tournament/
-├── .gitignore                    # Git ignore rules
-├── README.md                     # This file
-├── fxmanifest.lua               # Resource manifest
-├── client/                      # Client-side scripts
-│   ├── main.lua                 # Main client logic
-│   ├── npc.lua                  # NPC management
-│   ├── ui.lua                   # UI management
-│   └── zones.lua                # Zone detection
-├── server/                      # Server-side scripts
-│   ├── main.lua                 # Main server logic
-│   ├── database.lua             # Database operations
-│   └── callbacks.lua            # Business logic
-├── shared/                      # Shared configuration
-│   ├── config.lua               # Main configuration
-│   └── locale.lua               # Localization
-└── sql/                        # Database schema
-    └── tournament.sql
-```
-
 ## 🔧 Configuration
 
 ### Main Configuration (`shared/config.lua`)
@@ -204,6 +183,18 @@ The system uses modern Svelte 5 with runes for reactive state management:
 // Tournament store example
 export const tournaments = writable([]);
 export const activeTournament = writable(null);
+
+    activeTournaments: 0,
+    registrationOpen: 0,
+    myTeams: 0,
+    totalPrizePool: 0
+});
+
+$effect(() => {
+    if ($tournaments && $playerTeams) {
+        updateStats();
+    }
+});
 
 // Reactive actions
 export const tournamentActions = {
@@ -292,10 +283,13 @@ Config.Zone.Debug = true
 
 ### Development Setup
 1. Clone the repository
-2. Set up a FiveM development server
-3. Install required dependencies
-4. Configure database connection
-5. Test changes thoroughly
+2. Install Node.js dependencies: `npm install`
+3. Set up a FiveM development server
+4. Install required dependencies (ox_lib, interact, etc.)
+5. Configure database connection
+6. For UI development: `npm run dev`
+7. Build for production: `npm run build`
+8. Test changes thoroughly
 
 ### Code Standards
 - Follow QB-Core coding conventions
@@ -331,6 +325,30 @@ For support and questions:
 - **Community**: Join the FiveM development community
 - **Updates**: Watch the repository for updates
 
+## ⚡ Frontend Rewrite Highlights
+
+### What's New
+- **Complete UI Overhaul**: Rewritten from vanilla HTML/CSS/JS to modern Svelte 5
+- **Tailwind CSS**: Utility-first styling with custom design tokens
+- **Better Performance**: Smaller bundle size, faster loading, optimized rendering
+- **Modern Tooling**: Vite for development, PostCSS for styling, npm for dependencies
+- **Enhanced UX**: Smooth animations, better responsive design, improved accessibility
+- **Maintainable Code**: Component-based architecture, proper state management
+
+### Technical Improvements
+- **Bundle Size**: Reduced from multiple files to optimized single bundle
+- **Load Time**: Faster initial load with code splitting and tree shaking
+- **Reactivity**: Svelte 5's fine-grained reactivity for better performance
+- **Developer Experience**: Hot module replacement, better debugging, TypeScript support
+- **Accessibility**: Proper ARIA labels, keyboard navigation, screen reader support
+
+### Migration Benefits
+- **Future-Proof**: Modern tech stack that's actively maintained
+- **Scalability**: Easier to add new features and components
+- **Team Development**: Better code organization for multiple developers
+- **User Experience**: Smoother interactions and professional appearance
+
 ---
 
 **Made with ❤️ for the FiveM Racing Community**
+**Powered by Svelte 5 + Tailwind CSS**

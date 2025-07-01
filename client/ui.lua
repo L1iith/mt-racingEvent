@@ -210,6 +210,14 @@ RegisterNUICallback('reportMetrics', function(data, cb)
     cb('ok')
 end)
 
+RegisterNuiCallback("createTournament", function(data, cb)
+    lib.print.info(data, cb)
+    local created, message = lib.callback.await("mt-racingEvent/server/createTournament", 2000, data)
+    cb({
+        created, message
+    })
+end)
+
 -- Utility Functions
 function GetCurrentView()
     return currentView

@@ -5,8 +5,8 @@ local TournamentCallbacks = {}
 
 -- Get Active Tournaments
 function TournamentCallbacks.GetActiveTournaments()
-    local tournaments = exports['racing-tournament']:GetTournaments('registration')
-    local activeTournaments = exports['racing-tournament']:GetTournaments('active')
+    local tournaments = exports[cache.resource]:GetTournaments('registration')
+    local activeTournaments = exports[cache.resource]:GetTournaments('active')
     
     for _, tournament in pairs(activeTournaments) do
         table.insert(tournaments, tournament)
@@ -18,7 +18,7 @@ end
 -- Register Team
 function TournamentCallbacks.RegisterTeam(citizenId, tournamentId, teamData)
     -- Validate tournament exists and is open for registration
-    local tournament = exports['racing-tournament']:GetTournamentById(tournamentId)
+    local tournament = exports[cache.resource]:GetTournamentById(tournamentId)
     if not tournament then
         return false, _U('error_tournament_not_found')
     end
@@ -32,7 +32,7 @@ function TournamentCallbacks.RegisterTeam(citizenId, tournamentId, teamData)
     end
     
     -- Check if player is already in a team for this tournament
-    local existingMembership = exports['racing-tournament']:GetPlayerTeamMembership(citizenId, tournamentId)
+    local existingMembership = exports[cache.resource]:GetPlayerTeamMembership(citizenId, tournamentId)
     if existingMembership then
         return false, _U('error_player_already_in_team')
     end
@@ -43,7 +43,7 @@ function TournamentCallbacks.RegisterTeam(citizenId, tournamentId, teamData)
     end
     
     -- Check if team name is already taken
-    if exports['racing-tournament']:CheckTeamNameExists(tournamentId, teamData.name) then
+    if exports[cache.resource]:CheckTeamNameExists(tournamentId, teamData.name) then
         return false, _U('error_team_name_taken')
     end
     
@@ -60,31 +60,33 @@ function TournamentCallbacks.RegisterTeam(citizenId, tournamentId, teamData)
     
     -- Create team
     teamData.captain_cid = citizenId
-    local teamId = exports['racing-tournament']:CreateTeam(tournamentId, teamData)
+    local teamId = exports[cache.resource]:CreateTeam(tournamentId, teamData)
     
+    print(teamId)
     if not teamId then
         return false, _U('error_database')
     end
     
     -- Add captain as team member
     local playerName = Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname
-    local memberAdded = exports['racing-tournament']:AddTeamMember(teamId, citizenId, playerName, 'captain')
+    local memberAdded, error = TournamentCallbacks.AddTeamMember(teamId, citizenId, playerName, 'captain')
     
+    print(memberAdded)
     if not memberAdded then
         -- Rollback team creation
-        exports['racing-tournament']:DeleteTeam(teamId)
-        return false, _U('error_database')
+        exports[cache.resource]:DeleteTeam(teamId)
+        return false, error
     end
     
     -- Deduct registration fee
     Player.Functions.RemoveMoney('cash', tournament.registration_fee, 'tournament-registration')
     
     -- Update team registration fee status
-    exports['racing-tournament']:UpdateTeam(teamId, {registration_fee_paid = 1})
+    exports[cache.resource]:UpdateTeam(teamId, {registration_fee_paid = 1})
     
     -- Update tournament prize pool
     local newPrizePool = tournament.prize_pool + tournament.registration_fee
-    exports['racing-tournament']:UpdateTournament(tournamentId, {prize_pool = newPrizePool})
+    exports[cache.resource]:UpdateTournament(tournamentId, {prize_pool = newPrizePool})
     
     return true, {
         teamId = teamId,
@@ -96,11 +98,11 @@ end
 -- Update Team
 function TournamentCallbacks.UpdateTeam(citizenId, teamId, updateData)
     -- Check if player is team captain
-    if not exports['racing-tournament']:IsTeamCaptain(teamId, citizenId) then
+    if not exports[cache.resource]:IsTeamCaptain(teamId, citizenId) then
         return false, _U('error_not_team_captain')
     end
     
-    local team = exports['racing-tournament']:GetTeamById(teamId)
+    local team = exports[cache.resource]:GetTeamById(teamId)
     if not team then
         return false, _U('error_team_not_found')
     end
@@ -112,13 +114,13 @@ function TournamentCallbacks.UpdateTeam(citizenId, teamId, updateData)
         end
         
         -- Check if new name is already taken (excluding current team)
-        local existingTeam = exports['racing-tournament']:CheckTeamNameExists(team.tournament_id, updateData.team_name)
+        local existingTeam = exports[cache.resource]:CheckTeamNameExists(team.tournament_id, updateData.team_name)
         if existingTeam and existingTeam ~= teamId then
             return false, _U('error_team_name_taken')
         end
     end
     
-    local success = exports['racing-tournament']:UpdateTeam(teamId, updateData)
+    local success = exports[cache.resource]:UpdateTeam(teamId, updateData)
     
     if success then
         return true, {teamId = teamId, updateData = updateData}
@@ -129,25 +131,25 @@ end
 
 -- Leave Team
 function TournamentCallbacks.LeaveTeam(citizenId, teamId)
-    local team = exports['racing-tournament']:GetTeamById(teamId)
+    local team = exports[cache.resource]:GetTeamById(teamId)
     if not team then
         return false, _U('error_team_not_found')
     end
     
     -- Check if player is team captain
     if team.captain_cid == citizenId then
-        local members = exports['racing-tournament']:GetTeamMembers(teamId)
+        local members = exports[cache.resource]:GetTeamMembers(teamId)
         if #members > 1 then
             return false, _U('error_cannot_leave_as_captain')
         end
     end
     
-    local success = exports['racing-tournament']:RemoveTeamMember(teamId, citizenId)
+    local success = exports[cache.resource]:RemoveTeamMember(teamId, citizenId)
     
     if success then
         -- If captain left and was the only member, delete the team
         if team.captain_cid == citizenId then
-            exports['racing-tournament']:DeleteTeam(teamId)
+            exports[cache.resource]:DeleteTeam(teamId)
         end
         
         return true, {teamId = teamId}
@@ -159,11 +161,11 @@ end
 -- Disband Team
 function TournamentCallbacks.DisbandTeam(citizenId, teamId)
     -- Check if player is team captain
-    if not exports['racing-tournament']:IsTeamCaptain(teamId, citizenId) then
+    if not exports[cache.resource]:IsTeamCaptain(teamId, citizenId) then
         return false, _U('error_not_team_captain')
     end
     
-    local success = exports['racing-tournament']:DeleteTeam(teamId)
+    local success = exports[cache.resource]:DeleteTeam(teamId)
     
     if success then
         return true, {teamId = teamId}
@@ -175,11 +177,11 @@ end
 -- Add Team Member
 function TournamentCallbacks.AddTeamMember(captainId, teamId, targetCitizenId, role)
     -- Check if player is team captain
-    if not exports['racing-tournament']:IsTeamCaptain(teamId, captainId) then
+    if not exports[cache.resource]:IsTeamCaptain(teamId, captainId) then
         return false, _U('error_not_team_captain')
     end
     
-    local team = exports['racing-tournament']:GetTeamById(teamId)
+    local team = exports[cache.resource]:GetTeamById(teamId)
     if not team then
         return false, _U('error_team_not_found')
     end
@@ -191,13 +193,13 @@ function TournamentCallbacks.AddTeamMember(captainId, teamId, targetCitizenId, r
     end
     
     -- Check if target player is already in a team for this tournament
-    local existingMembership = exports['racing-tournament']:GetPlayerTeamMembership(targetCitizenId, team.tournament_id)
+    local existingMembership = exports[cache.resource]:GetPlayerTeamMembership(targetCitizenId, team.tournament_id)
     if existingMembership then
         return false, _U('error_player_already_in_team')
     end
     
     -- Check if team is full
-    local members = exports['racing-tournament']:GetTeamMembers(teamId)
+    local members = exports[cache.resource]:GetTeamMembers(teamId)
     if #members >= Config.Tournament.MaxTeamSize then
         return false, _U('error_team_full')
     end
@@ -216,7 +218,7 @@ function TournamentCallbacks.AddTeamMember(captainId, teamId, targetCitizenId, r
     end
     
     local playerName = targetPlayer.PlayerData.charinfo.firstname .. ' ' .. targetPlayer.PlayerData.charinfo.lastname
-    local success = exports['racing-tournament']:AddTeamMember(teamId, targetCitizenId, playerName, role)
+    local success = exports[cache.resource]:AddTeamMemberDB(teamId, targetCitizenId, playerName, role)
     
     if success then
         return true, {
@@ -233,7 +235,7 @@ end
 -- Remove Team Member
 function TournamentCallbacks.RemoveTeamMember(captainId, teamId, targetCitizenId)
     -- Check if player is team captain
-    if not exports['racing-tournament']:IsTeamCaptain(teamId, captainId) then
+    if not exports[cache.resource]:IsTeamCaptain(teamId, captainId) then
         return false, _U('error_not_team_captain')
     end
     
@@ -242,7 +244,7 @@ function TournamentCallbacks.RemoveTeamMember(captainId, teamId, targetCitizenId
         return false, _U('error_cannot_remove_captain')
     end
     
-    local success = exports['racing-tournament']:RemoveTeamMember(teamId, targetCitizenId)
+    local success = exports[cache.resource]:RemoveTeamMember(teamId, targetCitizenId)
     
     if success then
         return true, {teamId = teamId, playerId = targetCitizenId}
@@ -254,7 +256,7 @@ end
 -- Change Player Role
 function TournamentCallbacks.ChangePlayerRole(captainId, teamId, targetCitizenId, newRole)
     -- Check if player is team captain
-    if not exports['racing-tournament']:IsTeamCaptain(teamId, captainId) then
+    if not exports[cache.resource]:IsTeamCaptain(teamId, captainId) then
         return false, _U('error_not_team_captain')
     end
     
@@ -276,7 +278,7 @@ function TournamentCallbacks.ChangePlayerRole(captainId, teamId, targetCitizenId
         return false, _U('error_invalid_role')
     end
     
-    local success = exports['racing-tournament']:UpdateTeamMemberRole(teamId, targetCitizenId, newRole)
+    local success = exports[cache.resource]:UpdateTeamMemberRole(teamId, targetCitizenId, newRole)
     
     if success then
         return true, {
@@ -291,16 +293,16 @@ end
 
 -- Get Player Teams
 function TournamentCallbacks.GetPlayerTeams(citizenId)
-    return exports['racing-tournament']:GetPlayerTeams(citizenId)
+    return exports[cache.resource]:GetPlayerTeams(citizenId)
 end
 
 -- Get Leaderboards
 function TournamentCallbacks.GetLeaderboards(tournamentId)
-    local leaderboard = exports['racing-tournament']:GetTournamentLeaderboard(tournamentId)
+    local leaderboard = exports[cache.resource]:GetTournamentLeaderboard(tournamentId)
     
     -- Add member details to each team
     for i, team in pairs(leaderboard) do
-        local members = exports['racing-tournament']:GetTeamMembers(team.id)
+        local members = exports[cache.resource]:GetTeamMembers(team.id)
         leaderboard[i].members = members
     end
     
@@ -313,25 +315,26 @@ function TournamentCallbacks.SearchPlayers(searchTerm)
         return {}
     end
     
-    return exports['racing-tournament']:SearchPlayers(searchTerm, 10)
+    return exports[cache.resource]:SearchPlayers(searchTerm, 10)
 end
 
 -- Create Tournament (Admin)
-function TournamentCallbacks.CreateTournament(tournamentName, creatorId)
+function TournamentCallbacks.CreateTournament(tournamentName, creatorId, maxTeams, registrationFee, prizePool, startDate, description)
     if not tournamentName or #tournamentName < 3 then
         return false, 'Tournament name must be at least 3 characters long'
     end
     
     local tournamentData = {
         name = tournamentName,
-        start_date = os.date('%Y-%m-%d %H:%M:%S', os.time() + 3600), -- Start in 1 hour
-        max_teams = Config.Tournament.MaxTeamsPerTournament,
-        registration_fee = Config.Tournament.DefaultRegistrationFee,
+        start_date = startDate or os.date('%Y-%m-%d %H:%M:%S', os.time() + 3600), -- Start in 1 hour
+        max_teams = maxTeams or Config.Tournament.MaxTeamsPerTournament,
+        registration_fee = registrationFee or Config.Tournament.DefaultRegistrationFee,
+        prize_pool = prizePool or 0,
         tournament_type = 'single_elimination',
-        description = 'Tournament created by administrator'
+        description = description or 'Tournament created by administrator'
     }
     
-    local tournamentId = exports['racing-tournament']:CreateTournament(tournamentData)
+    local tournamentId = exports[cache.resource]:CreateTournamentDB(tournamentData)
     
     if tournamentId then
         return true, {

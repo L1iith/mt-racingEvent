@@ -168,7 +168,7 @@
       </div>
 
       <!-- Quick Actions -->
-      <div class="card mt-6">
+      <!-- <div class="card mt-6">
         <h3 class="text-lg font-semibold text-white mb-4">Need Help?</h3>
         <div class="flex gap-4 flex-wrap">
           <button class="btn btn-primary">
@@ -184,7 +184,7 @@
             Community Discord
           </button>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </div>

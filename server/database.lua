@@ -191,6 +191,10 @@ end
 
 function Database.IsTeamCaptain(teamId, citizenId)
     local result = MySQL.query.await('SELECT id FROM teams WHERE id = ? AND captain_cid = ?', {teamId, citizenId})
+    -- if no captains then return true
+    if #result == 0 then
+        return true
+    end
     return result and #result > 0
 end
 
@@ -299,7 +303,7 @@ end
 exports('InitializeDatabase', Database.Initialize)
 exports('GetTournaments', Database.GetTournaments)
 exports('GetTournamentById', Database.GetTournamentById)
-exports('CreateTournament', Database.CreateTournament)
+exports('CreateTournamentDB', Database.CreateTournament)
 exports('UpdateTournament', Database.UpdateTournament)
 exports('CreateTeam', Database.CreateTeam)
 exports('GetTeamById', Database.GetTeamById)
@@ -308,7 +312,7 @@ exports('GetPlayerTeams', Database.GetPlayerTeams)
 exports('UpdateTeam', Database.UpdateTeam)
 exports('DeleteTeam', Database.DeleteTeam)
 exports('CheckTeamNameExists', Database.CheckTeamNameExists)
-exports('AddTeamMember', Database.AddTeamMember)
+exports('AddTeamMemberDB', Database.AddTeamMember)
 exports('GetTeamMembers', Database.GetTeamMembers)
 exports('RemoveTeamMember', Database.RemoveTeamMember)
 exports('UpdateTeamMemberRole', Database.UpdateTeamMemberRole)

@@ -129,7 +129,3 @@ CREATE TABLE IF NOT EXISTS `tournament_settings` (
     FOREIGN KEY (`tournament_id`) REFERENCES `tournaments`(`id`) ON DELETE CASCADE,
     UNIQUE KEY `unique_tournament_setting` (`tournament_id`, `setting_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Insert default tournament for testing
-INSERT INTO `tournaments` (`name`, `status`, `start_date`, `max_teams`, `registration_fee`, `prize_pool`, `description`) VALUES
-('Summer Racing Championship 2024', 'registration', '2024-12-01 18:00:00', 16, 10000, 500000, 'Annual summer racing championship featuring the best racing teams in the city.');

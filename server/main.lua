@@ -3,7 +3,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 -- Tournament Management
 RegisterNetEvent('tournament:server:getTournaments', function()
     local src = source
-    local tournaments = exports['racing-tournament']:GetActiveTournaments()
+    local tournaments = exports[cache.resource]:GetActiveTournaments()
     TriggerClientEvent('tournament:client:receiveTournaments', src, tournaments)
 end)
 
@@ -19,7 +19,7 @@ RegisterNetEvent('tournament:server:registerTeam', function(tournamentId, teamDa
         return
     end
 
-    local success, message = exports['racing-tournament']:RegisterTeam(Player.PlayerData.citizenid, tournamentId, teamData)
+    local success, message = exports[cache.resource]:RegisterTeam(Player.PlayerData.citizenid, tournamentId, teamData)
     
     if success then
         TriggerClientEvent('ox_lib:notify', src, {
@@ -41,7 +41,7 @@ RegisterNetEvent('tournament:server:getPlayerTeams', function()
     
     if not Player then return end
     
-    local teams = exports['racing-tournament']:GetPlayerTeams(Player.PlayerData.citizenid)
+    local teams = exports[cache.resource]:GetPlayerTeams(Player.PlayerData.citizenid)
     TriggerClientEvent('tournament:client:receivePlayerTeams', src, teams)
 end)
 
@@ -51,7 +51,7 @@ RegisterNetEvent('tournament:server:updateTeam', function(teamId, updateData)
     
     if not Player then return end
     
-    local success, message = exports['racing-tournament']:UpdateTeam(Player.PlayerData.citizenid, teamId, updateData)
+    local success, message = exports[cache.resource]:UpdateTeam(Player.PlayerData.citizenid, teamId, updateData)
     
     if success then
         TriggerClientEvent('ox_lib:notify', src, {
@@ -73,7 +73,7 @@ RegisterNetEvent('tournament:server:leaveTeam', function(teamId)
     
     if not Player then return end
     
-    local success, message = exports['racing-tournament']:LeaveTeam(Player.PlayerData.citizenid, teamId)
+    local success, message = exports[cache.resource]:LeaveTeam(Player.PlayerData.citizenid, teamId)
     
     if success then
         TriggerClientEvent('ox_lib:notify', src, {
@@ -95,7 +95,7 @@ RegisterNetEvent('tournament:server:disbandTeam', function(teamId)
     
     if not Player then return end
     
-    local success, message = exports['racing-tournament']:DisbandTeam(Player.PlayerData.citizenid, teamId)
+    local success, message = exports[cache.resource]:DisbandTeam(Player.PlayerData.citizenid, teamId)
     
     if success then
         TriggerClientEvent('ox_lib:notify', src, {
@@ -117,7 +117,7 @@ RegisterNetEvent('tournament:server:addTeamMember', function(teamId, targetCitiz
     
     if not Player then return end
     
-    local success, message = exports['racing-tournament']:AddTeamMember(Player.PlayerData.citizenid, teamId, targetCitizenId, role)
+    local success, message = exports[cache.resource]:AddTeamMember(Player.PlayerData.citizenid, teamId, targetCitizenId, role)
     
     if success then
         TriggerClientEvent('ox_lib:notify', src, {
@@ -139,7 +139,7 @@ RegisterNetEvent('tournament:server:removeTeamMember', function(teamId, targetCi
     
     if not Player then return end
     
-    local success, message = exports['racing-tournament']:RemoveTeamMember(Player.PlayerData.citizenid, teamId, targetCitizenId)
+    local success, message = exports[cache.resource]:RemoveTeamMember(Player.PlayerData.citizenid, teamId, targetCitizenId)
     
     if success then
         TriggerClientEvent('ox_lib:notify', src, {
@@ -161,7 +161,7 @@ RegisterNetEvent('tournament:server:changePlayerRole', function(teamId, targetCi
     
     if not Player then return end
     
-    local success, message = exports['racing-tournament']:ChangePlayerRole(Player.PlayerData.citizenid, teamId, targetCitizenId, newRole)
+    local success, message = exports[cache.resource]:ChangePlayerRole(Player.PlayerData.citizenid, teamId, targetCitizenId, newRole)
     
     if success then
         TriggerClientEvent('ox_lib:notify', src, {
@@ -179,33 +179,33 @@ end)
 
 RegisterNetEvent('tournament:server:getLeaderboards', function(tournamentId)
     local src = source
-    local leaderboards = exports['racing-tournament']:GetLeaderboards(tournamentId)
+    local leaderboards = exports[cache.resource]:GetLeaderboards(tournamentId)
     TriggerClientEvent('tournament:client:receiveLeaderboards', src, leaderboards)
 end)
 
 RegisterNetEvent('tournament:server:searchPlayers', function(searchTerm)
     local src = source
-    local players = exports['racing-tournament']:SearchPlayers(searchTerm)
+    local players = exports[cache.resource]:SearchPlayers(searchTerm)
     TriggerClientEvent('tournament:client:receivePlayerSearch', src, players)
 end)
 
 -- Admin Commands
-RegisterCommand(Config.Commands.AdminPanel, function(source, args, rawCommand)
+QBCore.Commands.Add(Config.Commands.AdminPanel, "", {}, false, function(source)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     
     if not Player then return end
     
-    if not QBCore.Functions.HasPermission(src, Config.Permissions.AdminCommands) then
-        TriggerClientEvent('ox_lib:notify', src, {
-            type = 'error',
-            description = _U('error_permission_denied')
-        })
-        return
-    end
+    -- if not QBCore.Functions.HasPermission(src, Config.Permissions.AdminCommands) then
+    --     TriggerClientEvent('ox_lib:notify', src, {
+    --         type = 'error',
+    --         description = _U('error_permission_denied')
+    --     })
+    --     return
+    -- end
     
     TriggerClientEvent('tournament:client:openAdminPanel', src)
-end, false)
+end, 'dev')
 
 RegisterCommand(Config.Commands.PlayerPanel, function(source, args, rawCommand)
     local src = source
@@ -239,7 +239,7 @@ RegisterCommand(Config.Commands.CreateTournament, function(source, args, rawComm
     end
     
     local tournamentName = table.concat(args, ' ')
-    local success, message = exports['racing-tournament']:CreateTournament(tournamentName, Player.PlayerData.citizenid)
+    local success, message = exports[cache.resource]:CreateTournament(tournamentName, Player.PlayerData.citizenid)
     
     if success then
         TriggerClientEvent('ox_lib:notify', src, {
@@ -261,22 +261,43 @@ RegisterNetEvent('QBCore:Server:PlayerLoaded', function()
     
     if Player then
         -- Send player their tournament data
-        local teams = exports['racing-tournament']:GetPlayerTeams(Player.PlayerData.citizenid)
+        local teams = exports[cache.resource]:GetPlayerTeams(Player.PlayerData.citizenid)
         TriggerClientEvent('tournament:client:receivePlayerTeams', src, teams)
     end
 end)
 
+-- Callback
+lib.callback.register("mt-racingEvent/server/createTournament", function(source, data)
+    local Player = QBCore.Functions.GetPlayer(source)
+
+    local success, message = exports[cache.resource]:CreateTournament(data.name, Player.PlayerData.citizenid, data.maxTeams, data.registrationFee, data.prizePool, data.startDate, data.description)
+    
+    if success then
+        TriggerClientEvent('ox_lib:notify', source, {
+            type = 'success',
+            description = _U('success_tournament_created')
+        })
+    else
+        TriggerClientEvent('ox_lib:notify', source, {
+            type = 'error',
+            description = message
+        })
+    end
+
+    return success, message
+end)
+
 -- Export Functions
 exports('GetActiveTournaments', function()
-    return exports['racing-tournament']:GetActiveTournaments()
+    return exports[cache.resource]:GetActiveTournaments()
 end)
 
 exports('GetPlayerTeams', function(citizenId)
-    return exports['racing-tournament']:GetPlayerTeams(citizenId)
+    return exports[cache.resource]:GetPlayerTeams(citizenId)
 end)
 
 exports('RegisterTeam', function(citizenId, tournamentId, teamData)
-    return exports['racing-tournament']:RegisterTeam(citizenId, tournamentId, teamData)
+    return exports[cache.resource]:RegisterTeam(citizenId, tournamentId, teamData)
 end)
 
 -- Resource Events
@@ -284,7 +305,7 @@ AddEventHandler('onResourceStart', function(resourceName)
     if GetCurrentResourceName() == resourceName then
         print('^2[Racing Tournament]^7 Resource started successfully')
         -- Initialize database tables if needed
-        exports['racing-tournament']:InitializeDatabase()
+        -- exports[cache.resource]:InitializeDatabase()
     end
 end)
 

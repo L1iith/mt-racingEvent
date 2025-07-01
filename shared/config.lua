@@ -2,8 +2,8 @@ Config = {}
 
 -- NPC Configuration
 Config.NPC = {
-    Model = 's_m_m_lawyer_01',
-    Location = vector4(-544.28, -204.16, 37.65, 206.55),
+    Model = 'a_m_m_salton_01',
+    Location = vector4(-121.51, 1918.69, 197.33, 266.15),
     Animation = {
         Dict = 'missheistdockssetup1clipboard@base',
         Name = 'base',
@@ -18,7 +18,6 @@ Config.NPC = {
 
 -- Zone Configuration
 Config.Zone = {
-    Location = vector3(-544.28, -204.16, 37.65),
     Radius = 25.0,
     Debug = false
 }

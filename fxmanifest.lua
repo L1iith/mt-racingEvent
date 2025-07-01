@@ -7,13 +7,13 @@ description 'Complete FiveM Racing Tournament Management System'
 version '1.0.0'
 
 shared_scripts {
+    "@ox_lib/init.lua",
     '@qb-core/shared/locale.lua',
     'shared/locale.lua',
     'shared/config.lua'
 }
 
 client_scripts {
-    '@qb-core/client/functions.lua',
     'client/main.lua',
     'client/npc.lua',
     'client/ui.lua',
@@ -27,15 +27,8 @@ server_scripts {
     'server/callbacks.lua'
 }
 
-ui_page 'nui/index.html'
+ui_page 'http://localhost:3000/'
 
-files {
-    'nui/index.html',
-    'nui/style.css',
-    'nui/script.js',
-    'nui/components/*.svelte',
-    'nui/stores/*.js'
-}
 
 dependencies {
     'qb-core',

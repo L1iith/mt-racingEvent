@@ -72,129 +72,131 @@
 
 <div id="tournament-app" class="font-sans">
   {#if $isVisible}
-    <!-- Main Container -->
-    <div class="w-screen h-screen bg-gradient-to-br from-dark-800/95 to-dark-900/95 backdrop-blur-lg flex flex-col animate-fade-in">
-      
-      <!-- Header -->
-      <header class="bg-black/30 border-b-2 border-primary-500 px-8 py-4">
-        <div class="flex justify-between items-center max-w-7xl mx-auto">
-          <div class="flex items-center gap-4">
-            <i class="fas fa-trophy text-3xl text-primary-500 animate-pulse-slow"></i>
-            <h1 class="text-2xl font-bold bg-gradient-to-r from-primary-500 to-yellow-500 bg-clip-text text-transparent">
-              Racing Tournament
-            </h1>
-          </div>
-          
-          <div class="flex items-center gap-6">
-            {#if $playerData}
-              <div class="text-right">
-                <div class="text-white font-semibold">{$playerData.name}</div>
-                <div class="flex items-center gap-2 text-green-400 text-sm">
-                  <i class="fas fa-dollar-sign"></i>
-                  {nui.formatMoney($playerData.money?.cash || 0)}
-                </div>
-              </div>
-            {/if}
+    <!-- Tablet Container -->
+    <div class="w-screen h-screen flex items-center justify-center">
+      <div class="w-[160vh] max-w-[90vw] h-[85vh] max-h-[85vh] bg-gradient-to-br from-dark-800/95 to-dark-900/95 rounded-2xl shadow-2xl border border-white/10 flex flex-col animate-fade-in overflow-hidden">
+        
+        <!-- Header -->
+        <header class="bg-black/30 border-b-2 border-primary-500 px-6 py-3 flex-shrink-0">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+              <i class="fas fa-trophy text-2xl text-primary-500 animate-pulse-slow"></i>
+              <h1 class="text-xl font-bold bg-gradient-to-r from-primary-500 to-yellow-500 bg-clip-text text-transparent">
+                Mystrey Town Racing Tournament
+              </h1>
+            </div>
             
-            <button 
-              class="w-10 h-10 bg-red-500/80 hover:bg-red-500 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
-              onclick={closeTournament}
-              aria-label="Close tournament interface"
-            >
-              <i class="fas fa-times text-white"></i>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <!-- Navigation -->
-      <nav class="bg-black/20 border-b border-white/10 px-8 py-4">
-        <div class="flex gap-4 max-w-7xl mx-auto flex-wrap">
-          <button 
-            class="nav-btn {$currentView === 'main' ? 'active' : ''}"
-            onclick={() => switchView('main')}
-          >
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-          </button>
-          
-          <button 
-            class="nav-btn {$currentView === 'tournaments' ? 'active' : ''}"
-            onclick={() => switchView('tournaments')}
-          >
-            <i class="fas fa-list"></i>
-            <span>Tournaments</span>
-          </button>
-          
-          <button 
-            class="nav-btn {$currentView === 'teams' ? 'active' : ''}"
-            onclick={() => switchView('teams')}
-          >
-            <i class="fas fa-users"></i>
-            <span>My Teams</span>
-          </button>
-          
-          <button 
-            class="nav-btn {$currentView === 'leaderboards' ? 'active' : ''}"
-            onclick={() => switchView('leaderboards')}
-          >
-            <i class="fas fa-medal"></i>
-            <span>Leaderboards</span>
-          </button>
-          
-          <button 
-            class="nav-btn {$currentView === 'rules' ? 'active' : ''}"
-            onclick={() => switchView('rules')}
-          >
-            <i class="fas fa-book"></i>
-            <span>Rules</span>
-          </button>
-          
-          {#if $isAdmin}
-            <button 
-              class="nav-btn admin-nav {$currentView === 'admin' ? 'active' : ''}"
-              onclick={() => switchView('admin')}
-            >
-              <i class="fas fa-cog"></i>
-              <span>Admin</span>
-            </button>
-          {/if}
-        </div>
-      </nav>
-
-      <!-- Main Content -->
-      <main class="flex-1 overflow-y-auto">
-        {#if $currentView === 'main'}
-          <MainMenu />
-        {:else if $currentView === 'tournaments'}
-          <TournamentList />
-        {:else if $currentView === 'teams'}
-          <TeamManagement />
-        {:else if $currentView === 'leaderboards'}
-          <Leaderboards />
-        {:else if $currentView === 'rules'}
-          <TournamentRules />
-        {:else if $currentView === 'admin' && $isAdmin}
-          <AdminPanel />
-        {:else}
-          <div class="flex items-center justify-center h-full">
-            <div class="text-center">
-              <i class="fas fa-exclamation-triangle text-6xl text-yellow-500 mb-4"></i>
-              <h2 class="text-2xl font-bold text-white mb-2">Page Not Found</h2>
-              <p class="text-gray-400 mb-4">The requested page could not be found.</p>
-              <button class="btn btn-primary" onclick={() => switchView('main')}>
-                <i class="fas fa-home"></i>
-                Go Home
+            <div class="flex items-center gap-4">
+              {#if $playerData}
+                <div class="text-right">
+                  <div class="text-white font-semibold text-sm">{$playerData.name}</div>
+                  <div class="flex items-center gap-1 text-green-400 text-xs">
+                    <i class="fas fa-dollar-sign"></i>
+                    {nui.formatMoney($playerData.money?.cash || 0)}
+                  </div>
+                </div>
+              {/if}
+              
+              <button 
+                class="w-8 h-8 bg-red-500/80 hover:bg-red-500 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
+                onclick={closeTournament}
+                aria-label="Close tournament interface"
+              >
+                <i class="fas fa-times text-white text-sm"></i>
               </button>
             </div>
           </div>
-        {/if}
-      </main>
+        </header>
 
-      <!-- Footer -->
-      <footer class="bg-black/30 border-t border-white/10 px-8 py-3 text-center">
-        <p class="text-gray-500 text-sm">&copy; 2024 Racing Tournament System | Powered by FiveM</p>
-      </footer>
+        <!-- Navigation -->
+        <nav class="bg-black/20 border-b border-white/10 px-6 py-3 flex-shrink-0">
+          <div class="flex gap-2 justify-center flex-wrap">
+            <button 
+              class="nav-btn {$currentView === 'main' ? 'active' : ''}"
+              onclick={() => switchView('main')}
+            >
+              <i class="fas fa-home"></i>
+              <span>Home</span>
+            </button>
+            
+            <button 
+              class="nav-btn {$currentView === 'tournaments' ? 'active' : ''}"
+              onclick={() => switchView('tournaments')}
+            >
+              <i class="fas fa-list"></i>
+              <span>Tournaments</span>
+            </button>
+            
+            <button 
+              class="nav-btn {$currentView === 'teams' ? 'active' : ''}"
+              onclick={() => switchView('teams')}
+            >
+              <i class="fas fa-users"></i>
+              <span>Teams</span>
+            </button>
+            
+            <button 
+              class="nav-btn {$currentView === 'leaderboards' ? 'active' : ''}"
+              onclick={() => switchView('leaderboards')}
+            >
+              <i class="fas fa-medal"></i>
+              <span>Leaderboards</span>
+            </button>
+            
+            <button 
+              class="nav-btn {$currentView === 'rules' ? 'active' : ''}"
+              onclick={() => switchView('rules')}
+            >
+              <i class="fas fa-book"></i>
+              <span>Rules</span>
+            </button>
+            
+            {#if $isAdmin}
+              <button 
+                class="nav-btn admin-nav {$currentView === 'admin' ? 'active' : ''}"
+                onclick={() => switchView('admin')}
+              >
+                <i class="fas fa-cog"></i>
+                <span>Admin</span>
+              </button>
+            {/if}
+          </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-6">
+          {#if $currentView === 'main'}
+            <MainMenu />
+          {:else if $currentView === 'tournaments'}
+            <TournamentList />
+          {:else if $currentView === 'teams'}
+            <TeamManagement />
+          {:else if $currentView === 'leaderboards'}
+            <Leaderboards />
+          {:else if $currentView === 'rules'}
+            <TournamentRules />
+          {:else if $currentView === 'admin' && $isAdmin}
+            <AdminPanel />
+          {:else}
+            <div class="flex items-center justify-center h-full">
+              <div class="text-center">
+                <i class="fas fa-exclamation-triangle text-5xl text-yellow-500 mb-3"></i>
+                <h2 class="text-xl font-bold text-white mb-2">Page Not Found</h2>
+                <p class="text-gray-400 mb-4 text-sm">The requested page could not be found.</p>
+                <button class="btn btn-primary" onclick={() => switchView('main')}>
+                  <i class="fas fa-home"></i>
+                  Go Home
+                </button>
+              </div>
+            </div>
+          {/if}
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-black/30 border-t border-white/10 px-6 py-2 text-center flex-shrink-0">
+          <p class="text-gray-500 text-xs">&copy; {new Date().getFullYear()} Mystrey Town | Powered by Laith & Jaser & Drak0ola</p>
+        </footer>
+      </div>
     </div>
   {/if}
 
@@ -204,7 +206,7 @@
 
 <style>
   .nav-btn {
-    @apply flex items-center gap-2 px-4 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200 font-medium text-sm;
+    @apply flex items-center gap-2 px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200 font-medium text-xs;
   }
 
   .nav-btn.active {
@@ -219,13 +221,25 @@
     @apply bg-red-500 border-red-500;
   }
 
-  @media (max-width: 768px) {
+  /* Tablet responsive adjustments */
+  @media (max-width: 1024px) {
+    .nav-btn {
+      @apply px-2 py-1.5 text-xs;
+    }
+    
+    .nav-btn span {
+      @apply text-xs;
+    }
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 640px) {
     .nav-btn span {
       @apply hidden;
     }
     
     .nav-btn {
-      @apply px-3 py-2;
+      @apply px-2 py-1.5;
     }
   }
 </style>

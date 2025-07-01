@@ -172,10 +172,10 @@
         <i class="fas fa-plus"></i>
         Create Tournament
       </button>
-      <button class="btn btn-secondary">
+      <!-- <button class="btn btn-secondary">
         <i class="fas fa-download"></i>
         Export Data
-      </button>
+      </button> -->
       <button class="btn btn-secondary">
         <i class="fas fa-chart-bar"></i>
         View Analytics
@@ -280,7 +280,7 @@
 
 <!-- Create Tournament Modal -->
 {#if showCreateModal}
-  <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
+  <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
     <div class="bg-dark-800/95 border border-white/20 rounded-2xl p-8 max-w-lg w-full mx-4 animate-scale-in">
       <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
         <i class="fas fa-trophy text-primary-500"></i>

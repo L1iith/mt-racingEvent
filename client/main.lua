@@ -118,11 +118,13 @@ function OpenTournamentNUI(isAdmin)
     
     SendNUIMessage({
         type = 'openTournament',
-        isAdmin = isAdmin or false,
-        playerData = {
-            citizenid = PlayerData.citizenid,
-            name = PlayerData.charinfo.firstname .. ' ' .. PlayerData.charinfo.lastname,
-            money = PlayerData.money
+        data = {
+            isAdmin = isAdmin or false,
+            playerData = {
+                citizenid = PlayerData.citizenid,
+                name = PlayerData.charinfo.firstname .. ' ' .. PlayerData.charinfo.lastname,
+                money = PlayerData.money
+            }
         }
     })
     
@@ -208,3 +210,14 @@ exports('OpenTournamentNUI', OpenTournamentNUI)
 exports('CloseTournamentNUI', CloseTournamentNUI)
 exports('IsNearNPC', function() return isNearNPC end)
 exports('SetNearNPC', function(state) isNearNPC = state end)
+
+-- Threads
+CreateThread(function ()
+    while not LocalPlayer.state.isLoggedIn do
+        Wait(500)
+        print("not isLoggedIn")
+    end
+    print("loaded")
+    isLoggedIn = true
+    PlayerData = QBCore.Functions.GetPlayerData()
+end)

@@ -1,9 +1,30 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
--- NPC State
+-- State
+local tournamentZone
 local tournamentNPC = nil
 local npcSpawned = false
 local npcInteraction = nil
+
+function InitZone()
+    tournamentZone = lib.zones.sphere({
+        coords = Config.NPC.Location.xyz,
+        radius = Config.Zone.Radius,
+        debug = Config.Zone.Debug,
+        onEnter = function()
+            if npcSpawned or tournamentNPC then
+                DespawnTournamentNPC()
+            end
+            SpawnTournamentNPC()
+        end,
+        
+        onExit = function()
+            if npcSpawned or tournamentNPC then
+                DespawnTournamentNPC()
+            end
+        end
+    })    
+end
 
 -- Spawn Tournament NPC
 function SpawnTournamentNPC()
@@ -12,11 +33,7 @@ function SpawnTournamentNPC()
     local npcModel = Config.NPC.Model
     local npcCoords = Config.NPC.Location
     
-    -- Request model
-    RequestModel(npcModel)
-    while not HasModelLoaded(npcModel) do
-        Wait(10)
-    end
+    lib.requestModel(npcModel)
     
     -- Create NPC
     tournamentNPC = CreatePed(4, npcModel, npcCoords.x, npcCoords.y, npcCoords.z - 1.0, npcCoords.w, false, true)
@@ -51,7 +68,7 @@ function SpawnTournamentNPC()
                 label = Config.NPC.Interaction.Label,
                 icon = Config.NPC.Interaction.Icon,
                 action = function()
-                    exports['racing-tournament']:OpenTournamentNUI()
+                   OpenTournamentNUI()
                 end
             }
         }
@@ -117,27 +134,12 @@ end
 
 -- NPC Health Check (runs every 30 seconds when spawned)
 CreateThread(function()
-    while true do
-        Wait(30000) -- 30 seconds
-        
-        if npcSpawned and not DoesEntityExist(tournamentNPC) then
-            print('^1[Racing Tournament]^7 NPC entity lost, respawning...')
-            npcSpawned = false
-            
-            -- Respawn if zone is still active
-            if exports['racing-tournament']:IsZoneActive() then
-                SpawnTournamentNPC()
-            end
-        end
-        
-        -- Ensure animation is still playing
-        if npcSpawned and DoesEntityExist(tournamentNPC) then
-            if not IsEntityPlayingAnim(tournamentNPC, Config.NPC.Animation.Dict, Config.NPC.Animation.Name, 3) then
-                TaskPlayAnim(tournamentNPC, Config.NPC.Animation.Dict, Config.NPC.Animation.Name, 8.0, 8.0, -1, Config.NPC.Animation.Flag, 0, false, false, false)
-            end
-        end
+    while not LocalPlayer.state.isLoggedIn do
+        Wait(500) -- 30 seconds
     end
+    InitZone()
 end)
+
 
 -- Clean up on resource stop
 AddEventHandler('onResourceStop', function(resourceName)

@@ -1,6 +1,5 @@
-# Racing Tournament System
-
-A comprehensive FiveM racing tournament management system built with modern web technologies and seamless integration with QB-Core framework.
+# MT Racing Tournament System - Event
+A comprehensive FiveM racing tournament system.
 
 ## 🏁 Features
 
@@ -46,13 +45,13 @@ A comprehensive FiveM racing tournament management system built with modern web 
 ### 1. Download and Extract
 ```bash
 cd resources
-git clone https://github.com/your-repo/racing-tournament
+git clone https://github.com/L1iith/mt-racingEvent
 ```
 
 ### 2. Database Setup
 ```sql
 -- Import the database schema
-SOURCE racing-tournament/sql/tournament.sql;
+SOURCE mt-racingEvent/sql/tournament.sql;
 ```
 
 ### 3. Configuration
